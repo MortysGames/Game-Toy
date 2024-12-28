@@ -1,17 +1,21 @@
 const TETROMINOES = {
-  I: { shape: [[1, 1, 1, 1]], color: 'bg-green-900' },
-  L: { shape: [[1, 0], [1, 0], [1, 1]], color: 'bg-green-900' },
-  J: { shape: [[0, 1], [0, 1], [1, 1]], color: 'bg-green-900' },
-  O: { shape: [[1, 1], [1, 1]], color: 'bg-green-900' },
-  Z: { shape: [[1, 1, 0], [0, 1, 1]], color: 'bg-green-900' },
-  S: { shape: [[0, 1, 1], [1, 1, 0]], color: 'bg-green-900' },
-  T: { shape: [[1, 1, 1], [0, 1, 0]], color: 'bg-green-900' }
+    I: { shape: [[1, 1, 1, 1]], color: 'bg-green-900' },
+    L: { shape: [[1, 0], [1, 0], [1, 1]], color: 'bg-green-900' },
+    J: { shape: [[0, 1], [0, 1], [1, 1]], color: 'bg-green-900' },
+    O: { shape: [[1, 1], [1, 1]], color: 'bg-green-900' },
+    Z: { shape: [[1, 1, 0], [0, 1, 1]], color: 'bg-green-900' },
+    S: { shape: [[0, 1, 1], [1, 1, 0]], color: 'bg-green-900' },
+    T: { shape: [[1, 1, 1], [0, 1, 0]], color: 'bg-green-900' }
 };
 
-// Den React-Code direkt als Variable definieren
+
+
+
+
+// Rest des Codes bleibt gleich, aber ohne import-Statements
 const RetroTetris = () => {
-  // Hier kommt der komplette Inhalt der RetroTetris-Komponente
-  // [Ihr vorheriger Code von const [gameBoard, setGameBoard] bis zum Ende der Komponente]
+    // Ihr vorheriger Code hier...
+};
 
   import React, { useState, useEffect, useCallback } from 'react';
 
@@ -348,8 +352,13 @@ const RetroTetris = () => {
 export default RetroTetris;
 };
 
-// Am Ende der Datei direkt rendern
+
+
+
+// Am Ende der Datei:
 ReactDOM.render(React.createElement(RetroTetris), document.getElementById('root'));
+
+
 
 
 
