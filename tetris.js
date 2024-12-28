@@ -331,3 +331,5 @@ const RetroTetris = () => {
 };
 
 export default RetroTetris;
+
+ReactDOM.render(<RetroTetris />, document.getElementById('root'));
