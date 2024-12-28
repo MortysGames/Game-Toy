@@ -4,11 +4,9 @@
     <title>Retro Tetris</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <style>
-        /* Hier kommen alle CSS-Klassen aus meinem vorherigen Beispiel */
-           /* Tailwind-ähnliche Klassen */
         .bg-gray-900 { background-color: #1a202c; }
         .bg-gray-200 { background-color: #edf2f7; }
         .bg-gray-300 { background-color: #e2e8f0; }
@@ -64,7 +62,7 @@
         .flex { display: flex; }
         .items-center { align-items: center; }
         .justify-center { justify-content: center; }
-        .justify-between { justify-between: space-between; }
+        .justify-between { justify-content: space-between; }
         .flex-col { flex-direction: column; }
         .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .grid-cols-10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
@@ -85,8 +83,12 @@
 </head>
 <body>
     <div id="root"></div>
+    <script>
+        // Diese Variable müssen wir global definieren
+        const useState = React.useState;
+        const useEffect = React.useEffect;
+        const useCallback = React.useCallback;
+    </script>
     <script src="tetris.js"></script>
 </body>
 </html>
-
-
