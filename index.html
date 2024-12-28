@@ -4,18 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Retro Tetris</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: Arial, sans-serif; }
-    .grid-cell { width: 24px; height: 24px; }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+    }
   </style>
 </head>
-<body class="bg-gray-900">
+<body class="bg-gray-900 text-white">
   <div id="root"></div>
-  <script type="text/babel">
+
+  <script>
     const TETROMINOES = {
       I: { shape: [[1, 1, 1, 1]], color: 'bg-green-900' },
       L: { shape: [[1, 0], [1, 0], [1, 1]], color: 'bg-green-900' },
@@ -26,78 +25,53 @@
       T: { shape: [[1, 1, 1], [0, 1, 0]], color: 'bg-green-900' }
     };
 
-    function RetroTetris() {
-      const [gameBoard, setGameBoard] = React.useState(() => Array.from({ length: 20 }, () => Array(10).fill(0)));
-      const [currentPiece, setCurrentPiece] = React.useState(null);
-      const [position, setPosition] = React.useState({ x: 3, y: 0 });
-      const [gameOver, setGameOver] = React.useState(false);
+    let gameBoard = Array.from({ length: 20 }, () => Array(10).fill(0));
+    let currentPiece = null;
+    let position = { x: 3, y: 0 };
+    let gameOver = false;
+    let completedLines = 0;
 
-      const generateNewPiece = () => {
-        const pieces = Object.keys(TETROMINOES);
-        const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
-        setCurrentPiece({ shape: TETROMINOES[randomPiece].shape, color: TETROMINOES[randomPiece].color });
-        setPosition({ x: 3, y: 0 });
-      };
+    function renderBoard() {
+      const root = document.getElementById('root');
+      root.innerHTML = '';
+      const container = document.createElement('div');
+      container.className = 'flex flex-col items-center justify-center min-h-screen p-4';
 
-      React.useEffect(() => {
-        generateNewPiece();
-      }, []);
+      const board = document.createElement('div');
+      board.className = 'grid grid-cols-10 gap-px border-4 border-green-900 bg-green-200 p-1';
 
-      const handleKeyPress = (e) => {
-        if (gameOver) return;
-        switch (e.key) {
-          case 'ArrowLeft': setPosition(pos => ({ ...pos, x: pos.x - 1 })); break;
-          case 'ArrowRight': setPosition(pos => ({ ...pos, x: pos.x + 1 })); break;
-          case 'ArrowDown': setPosition(pos => ({ ...pos, y: pos.y + 1 })); break;
-          case 'ArrowUp':
-            const rotated = {
-              shape: currentPiece.shape[0].map((_, i) => currentPiece.shape.map(row => row[i]).reverse()),
-              color: currentPiece.color
-            };
-            setCurrentPiece(rotated);
-            break;
-          default: break;
-        }
-      };
-
-      React.useEffect(() => {
-        document.addEventListener('keydown', handleKeyPress);
-        return () => document.removeEventListener('keydown', handleKeyPress);
+      gameBoard.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          const block = document.createElement('div');
+          block.className = `w-6 h-6 ${cell ? 'bg-green-900' : 'bg-green-200'}`;
+          board.appendChild(block);
+        });
       });
-
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4 font-mono">
-          <div className="bg-gray-200 p-8 rounded-lg shadow-lg">
-            <div className="text-green-900 mb-4">Retro Tetris</div>
-            <div className="grid grid-cols-10 gap-0.5 border-4 border-green-900">
-              {gameBoard.map((row, y) =>
-                row.map((cell, x) => {
-                  let isCurrent = false;
-                  if (currentPiece) {
-                    currentPiece.shape.forEach((pieceRow, py) => {
-                      pieceRow.forEach((pieceCell, px) => {
-                        if (pieceCell && y === position.y + py && x === position.x + px) {
-                          isCurrent = true;
-                        }
-                      });
-                    });
-                  }
-
-                  return (
-                    <div
-                      key={`${y}-${x}`}
-                      className={`grid-cell ${isCurrent ? currentPiece.color : 'bg-green-200'}`}
-                    />
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      );
+      container.appendChild(board);
+      root.appendChild(container);
     }
 
-    ReactDOM.render(<RetroTetris />, document.getElementById('root'));
+    function movePiece(dx, dy) {
+      position.x += dx;
+      position.y += dy;
+      renderBoard();
+    }
+
+    function handleKeyPress(e) {
+      switch (e.key) {
+        case 'ArrowLeft': movePiece(-1, 0); break;
+        case 'ArrowRight': movePiece(1, 0); break;
+        case 'ArrowDown': movePiece(0, 1); break;
+        case 'ArrowUp': rotatePiece(); break;
+      }
+    }
+
+    function rotatePiece() {
+      // Rotation logic here
+    }
+
+    document.addEventListener('keydown', handleKeyPress);
+    renderBoard();
   </script>
 </body>
 </html>
