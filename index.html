@@ -16,20 +16,41 @@
 
   <script>
     const TETROMINOES = {
-      I: { shape: [[1, 1, 1, 1]], color: 'bg-green-900' },
-      L: { shape: [[1, 0], [1, 0], [1, 1]], color: 'bg-green-900' },
-      J: { shape: [[0, 1], [0, 1], [1, 1]], color: 'bg-green-900' },
-      O: { shape: [[1, 1], [1, 1]], color: 'bg-green-900' },
-      Z: { shape: [[1, 1, 0], [0, 1, 1]], color: 'bg-green-900' },
-      S: { shape: [[0, 1, 1], [1, 1, 0]], color: 'bg-green-900' },
-      T: { shape: [[1, 1, 1], [0, 1, 0]], color: 'bg-green-900' }
+      I: { shape: [[1, 1, 1, 1]], color: 'bg-blue-500' },
+      L: { shape: [[1, 0], [1, 0], [1, 1]], color: 'bg-orange-500' },
+      J: { shape: [[0, 1], [0, 1], [1, 1]], color: 'bg-indigo-500' },
+      O: { shape: [[1, 1], [1, 1]], color: 'bg-yellow-500' },
+      Z: { shape: [[1, 1, 0], [0, 1, 1]], color: 'bg-red-500' },
+      S: { shape: [[0, 1, 1], [1, 1, 0]], color: 'bg-green-500' },
+      T: { shape: [[1, 1, 1], [0, 1, 0]], color: 'bg-purple-500' }
     };
 
     let gameBoard = Array.from({ length: 20 }, () => Array(10).fill(0));
     let currentPiece = null;
+    let nextPiece = createPiece();
     let position = { x: 3, y: 0 };
     let gameOver = false;
     let completedLines = 0;
+    let score = 0;
+    let speed = 1000;
+
+    const highScores = [
+      { name: 'Kevin', score: 100 },
+      { name: 'Kevin', score: 90 },
+      { name: 'Kevin', score: 80 },
+      { name: 'Kevin', score: 70 },
+      { name: 'Player', score: 42 },
+      { name: 'Kevin', score: 60 }
+    ];
+
+    function createPiece() {
+      const pieces = Object.keys(TETROMINOES);
+      const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
+      return {
+        shape: TETROMINOES[randomPiece].shape,
+        color: TETROMINOES[randomPiece].color
+      };
+    }
 
     function renderBoard() {
       const root = document.getElementById('root');
@@ -37,40 +58,147 @@
       const container = document.createElement('div');
       container.className = 'flex flex-col items-center justify-center min-h-screen p-4';
 
+      const info = document.createElement('div');
+      info.className = 'text-lg mb-4';
+      info.innerText = `Score: ${score} | Lines: ${completedLines}`;
+      container.appendChild(info);
+
       const board = document.createElement('div');
-      board.className = 'grid grid-cols-10 gap-px border-4 border-green-900 bg-green-200 p-1';
+      board.className = 'grid grid-cols-10 gap-px border-4 border-gray-800 bg-gray-300 p-1';
 
       gameBoard.forEach((row, y) => {
         row.forEach((cell, x) => {
           const block = document.createElement('div');
-          block.className = `w-6 h-6 ${cell ? 'bg-green-900' : 'bg-green-200'}`;
+          let isCurrent = false;
+          if (currentPiece) {
+            currentPiece.shape.forEach((pieceRow, pieceY) => {
+              pieceRow.forEach((pieceCell, pieceX) => {
+                if (
+                  pieceCell &&
+                  y === position.y + pieceY &&
+                  x === position.x + pieceX
+                ) {
+                  isCurrent = true;
+                  block.className = `w-6 h-6 ${currentPiece.color}`;
+                }
+              });
+            });
+          }
+          if (!isCurrent) {
+            block.className = `w-6 h-6 ${cell ? 'bg-gray-800' : 'bg-gray-200'}`;
+          }
           board.appendChild(block);
         });
       });
+
       container.appendChild(board);
       root.appendChild(container);
     }
 
-    function movePiece(dx, dy) {
-      position.x += dx;
-      position.y += dy;
-      renderBoard();
+    function checkCollision(shape, pos) {
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) {
+            const newX = pos.x + x;
+            const newY = pos.y + y;
+            if (
+              newX < 0 ||
+              newX >= 10 ||
+              newY >= 20 ||
+              (newY >= 0 && gameBoard[newY][newX])
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
     }
 
-    function handleKeyPress(e) {
-      switch (e.key) {
-        case 'ArrowLeft': movePiece(-1, 0); break;
-        case 'ArrowRight': movePiece(1, 0); break;
-        case 'ArrowDown': movePiece(0, 1); break;
-        case 'ArrowUp': rotatePiece(); break;
+    function mergePiece() {
+      currentPiece.shape.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            gameBoard[position.y + y][position.x + x] = currentPiece.color;
+          }
+        });
+      });
+      clearLines();
+    }
+
+    function clearLines() {
+      let linesCleared = 0;
+      gameBoard = gameBoard.filter(row => {
+        if (row.every(cell => cell)) {
+          linesCleared++;
+          return false;
+        }
+        return true;
+      });
+
+      while (gameBoard.length < 20) {
+        gameBoard.unshift(Array(10).fill(0));
+      }
+      completedLines += linesCleared;
+      score += linesCleared * 100;
+
+      if (completedLines >= 4) {
+        showHighScoreScreen();
       }
     }
 
-    function rotatePiece() {
-      // Rotation logic here
+    function showHighScoreScreen() {
+      const root = document.getElementById('root');
+      root.innerHTML = '<h1 class="text-3xl">High Scores</h1>';
+      const list = document.createElement('ul');
+
+      highScores.forEach(({ name, score }) => {
+        const item = document.createElement('li');
+        item.innerText = `${name}: ${score}`;
+        list.appendChild(item);
+      });
+
+      const input = document.createElement('input');
+      input.placeholder = 'Enter Name';
+      const button = document.createElement('button');
+      button.innerText = 'Restart';
+      button.onclick = () => location.reload();
+
+      root.appendChild(list);
+      root.appendChild(input);
+      root.appendChild(button);
     }
 
-    document.addEventListener('keydown', handleKeyPress);
+    function gameLoop() {
+      if (!currentPiece) {
+        currentPiece = nextPiece;
+        nextPiece = createPiece();
+        position = { x: 3, y: 0 };
+
+        if (checkCollision(currentPiece.shape, position)) {
+          showHighScoreScreen();
+          return;
+        }
+      }
+
+      if (!movePiece(0, 1)) {
+        mergePiece();
+        currentPiece = null;
+      }
+      renderBoard();
+    }
+
+    function movePiece(dx, dy) {
+      const newPos = { x: position.x + dx, y: position.y + dy };
+      if (!checkCollision(currentPiece.shape, newPos)) {
+        position = newPos;
+        renderBoard();
+        return true;
+      }
+      return false;
+    }
+
+    setInterval(gameLoop, speed);
     renderBoard();
   </script>
 </body>
