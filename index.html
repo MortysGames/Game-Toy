@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Retro Tetris</title>
-  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .grid-cell { width: 24px; height: 24px; }
+  </style>
 </head>
 <body class="bg-gray-900">
   <div id="root"></div>
@@ -82,7 +86,7 @@
                   return (
                     <div
                       key={`${y}-${x}`}
-                      className={`w-6 h-6 ${isCurrent ? currentPiece.color : 'bg-green-200'}`}
+                      className={`grid-cell ${isCurrent ? currentPiece.color : 'bg-green-200'}`}
                     />
                   );
                 })
